@@ -1,0 +1,7 @@
+{
+  "name": "AukaAI - Smart Image Studio",
+  "description": "An AI-powered image editing and caption generation tool that understands natural language instructions to remove backgrounds, enhance quality, and create stylish social media captions.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
