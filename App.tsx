@@ -79,10 +79,10 @@ const App: React.FC = () => {
     }
   };
 
-  const downloadImage = () => {
+  const downloadImage = (imageUrl: string) => {
     const link = document.createElement('a');
-    link.href = imageState.edited || imageState.original || '';
-    link.download = 'edited-image.png';
+    link.href = imageUrl;
+    link.download = 'auka-ai-image.png';
     link.click();
   };
 
@@ -173,121 +173,124 @@ const App: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            {/* Image Preview - Always Visible */}
+            {/* Image Preview - Shows Original */}
             <div className="space-y-6 lg:sticky lg:top-28">
               <div className="relative group overflow-hidden rounded-[2.5rem] bg-white border border-slate-200 shadow-2xl shadow-slate-200/50 aspect-square flex items-center justify-center p-2">
-                {imageState.loading && (
-                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/90 backdrop-blur-md">
-                    <div className="w-16 h-16 relative">
-                      <div className="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
-                      <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
-                    </div>
-                    <p className="mt-6 font-bold text-slate-900">Enhancing your image...</p>
-                    <p className="text-slate-500 text-sm mt-1">This takes about 5-10 seconds</p>
-                  </div>
-                )}
-                
                 <img 
-                  src={imageState.edited || imageState.original} 
-                  alt="Editor workspace"
-                  className={`w-full h-full object-contain rounded-3xl transition-all duration-700 ${imageState.loading ? 'scale-95 opacity-50' : 'scale-100'}`}
+                  src={imageState.original} 
+                  alt="Original workspace"
+                  className="w-full h-full object-contain rounded-3xl"
                 />
-                
-                <div className="absolute top-6 left-6 flex gap-2">
+                <div className="absolute top-6 left-6">
                   <div className="px-4 py-1.5 bg-white/90 backdrop-blur-md text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm border border-slate-100">
-                    {imageState.edited ? 'Modified' : 'Original'}
+                    Source Image
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-4">
                 <Button 
-                  onClick={downloadImage} 
-                  variant="primary" 
+                  onClick={() => downloadImage(imageState.original!)} 
+                  variant="secondary" 
                   className="flex-1 rounded-2xl h-14"
-                  disabled={imageState.loading}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Save Image
+                  Download Source
                 </Button>
-                {imageState.edited && (
-                  <Button 
-                    variant="secondary" 
-                    className="!px-6 rounded-2xl h-14"
-                    onClick={() => setImageState(prev => ({ ...prev, edited: null }))}
-                    disabled={imageState.loading}
-                  >
-                    Reset Changes
-                  </Button>
-                )}
               </div>
             </div>
 
             {/* Dynamic Tools Section */}
             <div className="space-y-6">
               {activeTab === 'editor' ? (
-                <section className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm animate-fade-in">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-black text-slate-900">Image Editor</h3>
-                    <span className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Modification Instructions</label>
-                      <textarea
-                        placeholder="Tell AI what to do... (e.g., 'Remove background', 'Enhance lighting', 'Add a beach background')"
-                        className="w-full h-32 p-5 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none resize-none bg-slate-50 text-slate-900 placeholder-slate-400"
-                        value={instruction}
-                        onChange={(e) => setInstruction(e.target.value)}
-                      />
-                    </div>
-
-                    <Button 
-                      onClick={handleEdit} 
-                      isLoading={imageState.loading} 
-                      className="w-full rounded-2xl h-14 text-lg"
-                      disabled={!instruction}
-                    >
-                      Apply Magic
-                    </Button>
-                    
-                    {imageState.error && (
-                      <div className="p-4 bg-red-50 text-red-600 text-sm rounded-2xl border border-red-100 flex items-start gap-3">
-                         <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div className="space-y-6">
+                  <section className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm animate-fade-in">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-xl font-black text-slate-900">Image Editor</h3>
+                      <span className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
-                        {imageState.error}
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Quick Presets</label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {[
-                          { label: '🪄 Remove BG', cmd: 'Remove the background entirely' },
-                          { label: '✨ Enhance Pro', cmd: 'Upscale, sharpen and fix lighting' },
-                          { label: '🎬 Cinematic', cmd: 'Give it a professional movie aesthetic' },
-                          { label: '🧖 Retouch', cmd: 'Subtle beauty retouching and skin cleanup' }
-                        ].map((preset) => (
-                          <button 
-                            key={preset.label}
-                            onClick={() => setInstruction(preset.cmd)}
-                            className="text-sm font-bold p-4 bg-slate-50 text-slate-600 rounded-2xl hover:bg-indigo-50 hover:text-indigo-600 border border-transparent hover:border-indigo-100 transition-all text-left"
-                          >
-                            {preset.label}
-                          </button>
-                        ))}
-                      </div>
+                      </span>
                     </div>
-                  </div>
-                </section>
+                    
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Modification Instructions</label>
+                        <textarea
+                          placeholder="Tell AI what to do... (e.g., 'Remove background', 'Enhance lighting', 'Change sky to sunset')"
+                          className="w-full h-32 p-5 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none resize-none bg-slate-50 text-slate-900 placeholder-slate-400"
+                          value={instruction}
+                          onChange={(e) => setInstruction(e.target.value)}
+                        />
+                      </div>
+
+                      <Button 
+                        onClick={handleEdit} 
+                        isLoading={imageState.loading} 
+                        className="w-full rounded-2xl h-14 text-lg"
+                        disabled={!instruction}
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
+                        </svg>
+                        Apply Magic
+                      </Button>
+                      
+                      {imageState.error && (
+                        <div className="p-4 bg-red-50 text-red-600 text-sm rounded-2xl border border-red-100 flex items-start gap-3">
+                           <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          {imageState.error}
+                        </div>
+                      )}
+                    </div>
+                  </section>
+
+                  {/* Modified Result Section - Appears below Editor */}
+                  {(imageState.edited || imageState.loading) && (
+                    <section className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm animate-fade-in overflow-hidden">
+                      <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-xl font-black text-slate-900">Modified Result</h3>
+                        <div className="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-green-100">
+                          AI Generated
+                        </div>
+                      </div>
+
+                      <div className="relative aspect-square bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden flex items-center justify-center">
+                        {imageState.loading ? (
+                          <div className="flex flex-col items-center">
+                            <div className="w-12 h-12 relative mb-4">
+                              <div className="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
+                              <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+                            </div>
+                            <p className="text-sm font-bold text-slate-600">Processing Magic...</p>
+                          </div>
+                        ) : (
+                          <img src={imageState.edited!} alt="AI result" className="w-full h-full object-contain" />
+                        )}
+                      </div>
+
+                      {!imageState.loading && imageState.edited && (
+                        <div className="mt-6">
+                          <Button 
+                            variant="primary" 
+                            className="w-full h-12 rounded-xl"
+                            onClick={() => downloadImage(imageState.edited!)}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download Edited Image
+                          </Button>
+                        </div>
+                      )}
+                    </section>
+                  )}
+                </div>
               ) : (
                 <section className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm animate-fade-in">
                   <div className="flex justify-between items-center mb-6">
@@ -303,7 +306,7 @@ const App: React.FC = () => {
                     <div>
                       <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Context & Instructions</label>
                       <textarea
-                        placeholder="Optional: Add details about who is in the photo, the event, or specific hashtags to include..."
+                        placeholder="Optional: Add details about the image or specific hashtags to include..."
                         className="w-full h-28 p-5 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-purple-100 focus:border-purple-500 transition-all outline-none resize-none bg-slate-50 text-slate-900 placeholder-slate-400"
                         value={captionState.instruction}
                         onChange={(e) => setCaptionState(prev => ({ ...prev, instruction: e.target.value }))}
@@ -319,8 +322,8 @@ const App: React.FC = () => {
                             onClick={() => setCaptionState(prev => ({ ...prev, tone: t }))}
                             className={`p-4 rounded-2xl text-sm font-bold transition-all border-2 ${
                               captionState.tone === t 
-                              ? 'bg-purple-600 border-purple-600 text-white shadow-xl shadow-purple-100' 
-                              : 'bg-white border-slate-100 text-slate-500 hover:border-purple-200 hover:text-purple-600'
+                              ? 'bg-gradient-to-br from-purple-600 to-indigo-600 border-transparent text-white shadow-xl shadow-purple-200 scale-[1.02]' 
+                              : 'bg-white border-slate-100 text-slate-500 hover:border-purple-300 hover:bg-purple-50 hover:text-purple-600'
                             }`}
                           >
                             {t}
@@ -335,6 +338,9 @@ const App: React.FC = () => {
                       variant="primary"
                       className="w-full !bg-purple-600 hover:!bg-purple-700 rounded-2xl h-14 text-lg"
                     >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
                       Generate Copy
                     </Button>
 
@@ -382,7 +388,7 @@ const App: React.FC = () => {
            <div className="w-2 h-2 rounded-full bg-purple-200"></div>
            <div className="w-2 h-2 rounded-full bg-pink-200"></div>
         </div>
-        <p className="text-slate-400 text-sm font-medium tracking-wide">© 2024 AUKAAI STUDIO • AI POWERED CREATIVITY</p>
+        <p className="text-slate-400 text-sm font-medium tracking-wide">© {new Date().getFullYear()} AUKA AI STUDIO • AI POWERED CREATIVITY</p>
       </footer>
     </div>
   );
